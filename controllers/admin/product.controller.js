@@ -52,8 +52,18 @@ module.exports.index = async (req, res) => {
 
   //end pagination
 
+  //sort
+  let sort = {};
+
+  if (req.query.sortKey && req.query.sortValue) {
+    sort[req.query.sortKey] = req.query.sortValue; // sort(position,price,title) = desc, asc
+  } else {
+    sort.position = "desc";
+  }
+  //end sort
+
   const products = await Product.find(find)
-    .sort({ position: "desc" }) // desc giảm dần
+    .sort(sort) // desc giảm dần
     .limit(objectPagination.limitItem)
     .skip(objectPagination.skip);
 
@@ -156,11 +166,6 @@ module.exports.createPost = async (req, res) => {
     req.body.position = countProducts + 1;
   } else {
     req.body.position = parseInt(req.body.position);
-  }
-
-  // multer
-  if (req.file) {
-    req.body.thumbnail = `/uploads/${req.file.filename}`; // file.filename thuộc tính của thằng multer và gán lại cho thằng thumbnail trong server
   }
 
   // đẩy create lên database
